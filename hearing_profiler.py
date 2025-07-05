@@ -122,7 +122,12 @@ def main():
 			profile, average_score = classify_clinical(row['RU500'], row['RU1000'], row['RU2000'], row['LU500'], row['LU1000'], row['LU2000'])
 			ids.append(row['ID']) # This ensures the profiles are corresponding to the right ID
 			profiles.append(profile)
-			debugger.append(average_score) # For debugging
+		
+		# Convert to dataframe
+		data = {
+			'ID' : ids,
+			'Profile' : profiles
+		}
 
 	# Classify military
 	elif (boundaries.lower() == "military"): 
@@ -131,11 +136,21 @@ def main():
 		profiles = []
 		ids = []
 		debugger = []
+		better_profiles = []
+		worse_profiles = []
 		for index, row in df.iterrows():
 			profile, better_profile, worse_profile = classify_military(row['RU500'], row['RU1000'], row['RU2000'], row['LU500'], row['LU1000'], row['LU2000'])
 			ids.append(row['ID']) # This ensures the profiles are corresponding to the right ID
 			profiles.append(profile)
-			debugger.append(f"Better = {better_profile}, Worse = {worse_profile}")
+			better_profiles.append(better_profile)
+			worse_profiles.append(worse_profile)
+		
+		# Convert to dataframe
+		data = {
+			'ID' : ids,
+			'Profile (Better Ear)' : better_profiles,
+			'Profile (Worse Ear)' : worse_profiles
+		}
 
 
 	# Incorrect usage handling	
@@ -143,12 +158,7 @@ def main():
 		print("Correct usage: python hearing_profiler.py [military/clinical] [input_file].xlsx [output_file].xlsx")
 		quit()
 
-	# Convert to excel spreadsheet
-	data = {
-		'ID' : ids,
-		'Profile' : profiles,
-		'Debugging' : debugger
-	}
+	# Convert to excel
 	final_df = pd.DataFrame(data)
 	final_df.to_excel(output)
 
